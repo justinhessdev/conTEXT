@@ -1,0 +1,93 @@
+/*img.media-object {
+  width: 64px;
+  height: 64px;
+}
+
+.panel-default > .panel-heading {
+  background-color: #D8E0D8;
+  color: white;
+}
+
+.panel-heading {
+  border-radius: 0 !important;
+}
+.panel-body {
+    overflow-y: scroll;
+
+}
+.panel-body {
+  height: 500px; / change according to your requirement/
+}*/
+
+.message {
+  float: left;
+}
+
+/* .bubble */
+
+.bubble {
+  background-color: rgb(210, 244, 254);
+  /* vendor rules */
+  border-radius: 20px;
+  /* vendor rules */
+  /* vendor rules */
+  box-sizing: border-box;
+  clear: both;
+  float: left;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 8px 30px;
+  position: relative;
+  width: auto;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.imessages {
+  padding: 40px 20px;
+  margin: -30px 0 0 0;
+  width: 400px;
+}
+
+.bubble:before,
+.bubble:after {
+  border-radius: 20px / 10px;
+  content: '';
+  display: block;
+  position: absolute;
+}
+
+.bubble:before {
+  border: 10px solid transparent;
+  border-bottom-color: rgba(0, 0, 0, 0);
+  bottom: 0;
+  left: -7px;
+  z-index: -2;
+}
+
+.bubble:after {
+  border: 8px solid transparent;
+  border-bottom-color: #d2f4fe;
+  bottom: 1px;
+  left: -5px;
+}
+
+.bubble--alt {
+  background-color: rgb(204, 255, 204);
+  float: right;
+}
+
+.bubble--alt:before {
+  border-bottom-color: rgba(0, 0, 0, 0);
+  border-radius: 20px / 10px;
+  left: auto;
+  right: -7px;
+}
+
+.bubble--alt:after {
+  border-radius: 20px / 10px;
+  left: auto;
+  border-bottom-color: #BBFEB7;
+  right: -5px;
+}

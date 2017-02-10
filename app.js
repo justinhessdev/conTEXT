@@ -13,9 +13,10 @@ const Dashboard = React.createClass({
     return {
       isLoggedIn: true,
       messages: [
-        {id: 1, user_id: 1, body: "Haro Word"},
+        {id: 1, user_id: 1, body: "Hey there"},
         {id: 2, user_id: 1, body: "How are you?"},
-        {id: 3, user_id: 2, body: "I'm great! Thanks for asking"}
+        {id: 3, user_id: 2, body: "I'm great! Thanks for asking"},
+        {id: 4, user_id: 1, body: "😍"}
       ]
     }
   },
@@ -56,28 +57,28 @@ const Dashboard = React.createClass({
 const MessageList = React.createClass({
   render: function() {
     const messages = this.props.messages.map((m) => {
-      if(m.user_id == '1') {
+      if(m.user_id == '2') {
         return (
           <div key={m.id} className="clearfix">
-            <p key={m.id} className="pull-left">{m.body}</p>
+            <p key={m.id} className="bubble">{m.body}</p>
           </div>
         )
       } else {
         return (
           <div key={m.id} className="clearfix">
-            <p key={m.id} className="pull-right">{m.body}</p>
+            <p key={m.id} className="bubble bubble--alt">{m.body}</p>
           </div>
         )
       }
     })
     const divStyle = {
-      background: 'blue',
-      color: 'white'
+      marginTop: '5px',
+      padding: '10px'
     }
 
     return (
     <div className="row">
-      <div className="col-md-4 col-md-offset-1 ">
+      <div className="col-md-6 col-md-offset-1 ">
         <div style={divStyle} id="message-list">
           <br></br>
           {messages}
@@ -99,6 +100,10 @@ const MessageForm = React.createClass({
     this.refs.newMessage.value = ''
   },
 
+  showContextModal: function() {
+     $('.modal').modal()
+  },
+
 // when i say onSubmit we want to prevent refresh of page from form
 // we can use the event from the form onsubmit to prevent default behavior
   render: function() {
@@ -107,12 +112,15 @@ const MessageForm = React.createClass({
         <br></br>
 
         <form onSubmit={this.handleSubmit}>
-          <div className="col-md-4 col-md-offset-1">
-            <label className="sr-only" htmlFor="ex3">col-xs-4</label>
-            <input className="form-control" id="ex3" type='text' ref='newMessage'/>
+          <div className="col-md-6 col-md-offset-1">
+            <label className="sr-only" htmlFor="ex3">send message</label>
+            <div className="input-group">
+              <input className="form-control" id="ex3" type='text' ref='newMessage' placeholder="send message - press enter"/>
+              <div className="input-group-addon" onClick={this.showContextModal}>conTEXT</div>
+            </div>
           </div>
 
-          <button className="btn btn-primary" onClick={this.handleSubmit}>Submit</button>
+          <button className="btn btn-primary sr-only" onClick={this.handleSubmit}>Submit</button>
         </form>
 
 
@@ -124,3 +132,8 @@ const MessageForm = React.createClass({
 //react-dom helps us render / append to front end / DOM
 // takes two args -- 1. what to render 2. where to render
 ReactDOM.render(<Dashboard />, document.getElementById('main'))
+
+// $('.input-group-addon').on('click', (evt) => {
+//   console.log('clicked add on')
+//   $('.modal').modal()
+// })
