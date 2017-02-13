@@ -103,10 +103,24 @@
   border: 1px dotted black;
 }
 
+.white {
+  background: #ffffff;
+  padding: 20px;
+  border: 1px dotted black;
+}
+
 #ctxSelect {
   margin-left: 10px;
 }
 
 #urgentButton {
   margin-left: 10px;
+}
+
+.show {
+  display: block
+}
+
+.hide {
+  display: none
 }

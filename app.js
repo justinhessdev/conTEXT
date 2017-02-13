@@ -13,23 +13,23 @@ const Dashboard = React.createClass({
     return {
       isLoggedIn: true,
       messages: [
-        {id: 1, user_id: 1, body: "Hey there", urgent: 0, context: ''},
-        {id: 2, user_id: 1, body: "How are you?", urgent: 0, context: ''},
-        {id: 3, user_id: 2, body: "I'm great! Thanks for asking", urgent: 0, context: ''},
-        {id: 4, user_id: 1, body: "😍", urgent: 0, context: ''}
+        {id: 1, user_id: 1, body: "Hey there", context: false, urgent: false, customContext:""},
+        {id: 2, user_id: 1, body: "How are you?", context: false, urgent: false, customContext:""},
+        {id: 3, user_id: 2, body: "I'm great! Thanks for asking", context: false, urgent: false, customContext:""},
+        {id: 4, user_id: 1, body: "😍", context: false, urgent: false, customContext:""}
       ]
     }
   },
   // .map will return new array based on original one, formated how we choose
 
-  createMessage: function(body) {
+  createMessage: function(body, context, urgent, customContext) {
     this.setState({
       isLoggedIn: false,
       messages: [
         ...this.state.messages,
-        {id: this.state.messages.length + 1, user_id:1, body: body, urgent: 0, context: ''}
+        {id: this.state.messages.length + 1, user_id:1, body: body, urgent: 0, context: context, urgent: urgent, customContext: customContext}
       ]
-    })
+    }, () => console.log(this.state.messages[this.state.messages.length-1]))
   },
 
   lockForm: function() {
@@ -58,20 +58,44 @@ const Dashboard = React.createClass({
 const MessageList = React.createClass({
   render: function() {
     const messages = this.props.messages.map((m) => {
+      var urgentClass, urgentSpan
+      if(m.urgent) {
+        urgentClass='red'
+        urgentSpan='show'
+      } else {
+        urgentClass='white'
+        urgentSpan='hide'
+      }
+
+      console.log(urgentClass)
+
       if(m.user_id == '2') {
         return (
           <div key={m.id} className="clearfix">
             <p key={m.id} className="bubble">{m.body}</p>
           </div>
         )
-      } else {
+      } else if (m.user_id == '1' && m.context) {
         return (
           <div key={m.id} className="clearfix">
-            <p key={m.id} className="bubble bubble--alt">{m.body}</p>
+            <div className="bubble bubble--alt">
+              <div className={urgentClass}>
+                <p><span className={urgentSpan}>URGENT</span>This message has conTEXT</p>
+                <p>{m.customContext}</p>
+                <p>{m.body}</p>
+              </div>
+            </div>
           </div>
         )
+      } else {
+         return (
+           <div key={m.id} className="clearfix">
+             <p key={m.id} className="bubble bubble--alt">{m.body}</p>
+           </div>
+         )
       }
     })
+
     const divStyle = {
       border: "1px dotted black",
       marginTop: '5px',
@@ -98,18 +122,14 @@ const MessageList = React.createClass({
 const MessageForm = React.createClass({
   handleSubmit: function(evt) {
     evt.preventDefault()
-    this.props.onSubmit(this.refs.newMessage.value)
+    this.props.onSubmit(this.refs.newMessage.value, false, false)
     this.refs.newMessage.value = ''
   },
 
   showContextModal: function() {
      $('#ctx-form').show()
      $('#message-form').hide()
-  },
-
-  modalSubmit: function(message) {
-    this.props.onSubmit(message)
-
+     this.refs.newMessage.value = ''
   },
 
 // when i say onSubmit we want to prevent refresh of page from form
@@ -138,14 +158,18 @@ const CtxForm = React.createClass({
 
   getInitialState: function() {
     return {
+      urgentClickCount: 0,
+      isUrgent: false,
       value: 'blank'
     }
   },
 
   handleSubmit: function(evt) {
     evt.preventDefault()
-    this.props.onSubmit(this.refs.ctxMessage.value)
+    var customctx = $("#ctxSelect option:selected").text()
+    this.props.onSubmit(this.refs.ctxMessage.value, true, this.state.isUrgent, customctx)
     this.refs.ctxMessage.value = ''
+    this.setState({isUrgent: false, value: 'blank'})
     $('#ctxBorder').removeClass('red')
     $('#ctx-form').hide()
     $('#message-form').show()
@@ -153,11 +177,14 @@ const CtxForm = React.createClass({
 
   // change state of select options
   handleChange: function(event) {
-    this.setState({value: event.target.value});
+    this.setState({value: event.target.value})
+    console.log($("#ctxSelect option:selected").text())
   },
 
   // handel when user clicks close.. hide context form and show original input form
   handleClose: function(event) {
+    this.setState({isUrgent: false, value: 'blank'})
+    this.refs.ctxMessage.value = ''
     $('#ctx-form').hide()
     $('#ctxBorder').removeClass('red')
     $('#message-form').show()
@@ -165,6 +192,10 @@ const CtxForm = React.createClass({
 
   handleUrgent: function() {
     $('#ctxBorder').toggleClass('red')
+      this.setState({
+        urgentClickCount: this.state.urgentClickCount+1,
+        isUrgent: !this.state.isUrgent
+      }, () => console.log(this.state))
   },
 
   // when i say onSubmit we want to prevent refresh of page from form
@@ -176,21 +207,28 @@ const CtxForm = React.createClass({
           <div className="col-md-6 col-md-offset-1">
             <div className="form-group">
               <div id="ctxBorder">
-                <p>What do you want to talk about?</p>
+                <label htmlFor="ctx-area">What do you want to talk about?</label>
                 <textarea className="form-control"  id="ctx-area" ref='ctxMessage' rows="2"></textarea>
                 <br></br>
-                <label htmlFor="more">Add more context</label>
+                <label htmlFor="ctxSelect">Send custom context</label>
                 <select id="ctxSelect" value={this.state.value} onChange={this.handleChange}>
-                  <option value="blank">Add more context</option>
-                  <option value="time">Time</option>
-                  <option value="location">Location</option>
-                  <option value="reminder">Set a reminder</option>
+                  <option value="blank" ></option>
+                  <option value="thinking">Thinking of you</option>
+                  <option value="love">Love you</option>
+                  <option value="miss">Miss you</option>
+                  <option value="hurt">Feelings hurt</option>
+                  <option value="upset">I'm upset</option>
+                  <option value="upset-you">I'm upset at you</option>
+                  <option value="angry">I'm angry</option>
+                  <option value="angry-you">I'm angry at you</option>
+                  <option value="ignore">I'm ignoring you</option>
+                  <option value="food">I want food</option>
                 </select>
                 <br></br>
                 <label htmlFor="urgent">Make it urgent</label>
                 <button id="urgentButton" type="button" className="btn btn-default" onClick={this.handleUrgent}>Urgent</button>
-                <button type="button" className="btn btn-default pull-right" onClick={this.handleClose}>Close</button>
                 <button id="sendContextButton" type="button" className="btn btn-primary pull-right" onClick={this.handleSubmit}>Send</button>
+                <button type="button" className="btn btn-default pull-right" onClick={this.handleClose}>Close</button>
               </div>
             </div>
           </div>
