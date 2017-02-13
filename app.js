@@ -13,10 +13,10 @@ const Dashboard = React.createClass({
     return {
       isLoggedIn: true,
       messages: [
-        {id: 1, user_id: 1, body: "Hey there"},
-        {id: 2, user_id: 1, body: "How are you?"},
-        {id: 3, user_id: 2, body: "I'm great! Thanks for asking"},
-        {id: 4, user_id: 1, body: "😍"}
+        {id: 1, user_id: 1, body: "Hey there", urgent: 0, context: ''},
+        {id: 2, user_id: 1, body: "How are you?", urgent: 0, context: ''},
+        {id: 3, user_id: 2, body: "I'm great! Thanks for asking", urgent: 0, context: ''},
+        {id: 4, user_id: 1, body: "😍", urgent: 0, context: ''}
       ]
     }
   },
@@ -27,7 +27,7 @@ const Dashboard = React.createClass({
       isLoggedIn: false,
       messages: [
         ...this.state.messages,
-        {id: this.state.messages.length + 1, user_id:1, body: body}
+        {id: this.state.messages.length + 1, user_id:1, body: body, urgent: 0, context: ''}
       ]
     })
   },
@@ -42,8 +42,9 @@ const Dashboard = React.createClass({
     if(this.state.isLoggedIn) { setTimeout(this.lockForm, 5000) }
     return (
       <div id="dashboard">
-        <MessageList messages={this.state.messages} />
+        <MessageList messages={this.state.messages}/>
         <MessageForm onSubmit={this.createMessage}/>
+        <CtxForm onSubmit={this.createMessage}/>
       </div>
     )
   }
@@ -72,6 +73,7 @@ const MessageList = React.createClass({
       }
     })
     const divStyle = {
+      border: "1px dotted black",
       marginTop: '5px',
       padding: '10px'
     }
@@ -101,7 +103,13 @@ const MessageForm = React.createClass({
   },
 
   showContextModal: function() {
-     $('.modal').modal()
+     $('#ctx-form').show()
+     $('#message-form').hide()
+  },
+
+  modalSubmit: function(message) {
+    this.props.onSubmit(message)
+
   },
 
 // when i say onSubmit we want to prevent refresh of page from form
@@ -119,11 +127,74 @@ const MessageForm = React.createClass({
               <div className="input-group-addon" onClick={this.showContextModal}>conTEXT</div>
             </div>
           </div>
-
           <button className="btn btn-primary sr-only" onClick={this.handleSubmit}>Submit</button>
         </form>
+      </div>
+    )
+  }
+})
 
+const CtxForm = React.createClass({
 
+  getInitialState: function() {
+    return {
+      value: 'blank'
+    }
+  },
+
+  handleSubmit: function(evt) {
+    evt.preventDefault()
+    this.props.onSubmit(this.refs.ctxMessage.value)
+    this.refs.ctxMessage.value = ''
+    $('#ctxBorder').removeClass('red')
+    $('#ctx-form').hide()
+    $('#message-form').show()
+  },
+
+  // change state of select options
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+
+  // handel when user clicks close.. hide context form and show original input form
+  handleClose: function(event) {
+    $('#ctx-form').hide()
+    $('#ctxBorder').removeClass('red')
+    $('#message-form').show()
+  },
+
+  handleUrgent: function() {
+    $('#ctxBorder').toggleClass('red')
+  },
+
+  // when i say onSubmit we want to prevent refresh of page from form
+  // we can use the event from the form onsubmit to prevent default behavior
+  render: function() {
+    return (
+      <div id='ctx-form'>
+        <form onSubmit={this.handleSubmit}>
+          <div className="col-md-6 col-md-offset-1">
+            <div className="form-group">
+              <div id="ctxBorder">
+                <p>What do you want to talk about?</p>
+                <textarea className="form-control"  id="ctx-area" ref='ctxMessage' rows="2"></textarea>
+                <br></br>
+                <label htmlFor="more">Add more context</label>
+                <select id="ctxSelect" value={this.state.value} onChange={this.handleChange}>
+                  <option value="blank">Add more context</option>
+                  <option value="time">Time</option>
+                  <option value="location">Location</option>
+                  <option value="reminder">Set a reminder</option>
+                </select>
+                <br></br>
+                <label htmlFor="urgent">Make it urgent</label>
+                <button id="urgentButton" type="button" className="btn btn-default" onClick={this.handleUrgent}>Urgent</button>
+                <button type="button" className="btn btn-default pull-right" onClick={this.handleClose}>Close</button>
+                <button id="sendContextButton" type="button" className="btn btn-primary pull-right" onClick={this.handleSubmit}>Send</button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
     )
   }
@@ -132,8 +203,3 @@ const MessageForm = React.createClass({
 //react-dom helps us render / append to front end / DOM
 // takes two args -- 1. what to render 2. where to render
 ReactDOM.render(<Dashboard />, document.getElementById('main'))
-
-// $('.input-group-addon').on('click', (evt) => {
-//   console.log('clicked add on')
-//   $('.modal').modal()
-// })

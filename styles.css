@@ -91,3 +91,22 @@
   border-bottom-color: #BBFEB7;
   right: -5px;
 }
+
+#ctx-form {
+  display: none;
+  margin-top: 20px;
+}
+
+.red {
+  background: #ff999c;
+  padding: 20px;
+  border: 1px dotted black;
+}
+
+#ctxSelect {
+  margin-left: 10px;
+}
+
+#urgentButton {
+  margin-left: 10px;
+}
