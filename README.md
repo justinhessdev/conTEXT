@@ -5,16 +5,16 @@
 ### Instantly know why you are being texted
 
 ###### Send instant messages
-![Alt text](./img/message_list.png?raw=true "Optional Title")
+![Alt text](./client/img/message_list.png?raw=true "Optional Title")
 
 ###### Send instant messages with context
-![Alt text](./img/send_plain_context.png?raw=true "Optional Title")
+![Alt text](./client/img/send_plain_context.png?raw=true "Optional Title")
 
 ###### Add urgent context
-![Alt text](./img/add_context.png?raw=true "Optional Title")
+![Alt text](./client/img/add_context.png?raw=true "Optional Title")
 
 ###### Send urgent context
-![Alt text](./img/send_urgent_context.png?raw=true "Optional Title")
+![Alt text](./client/img/send_urgent_context.png?raw=true "Optional Title")
 
 
 #### Technologies used: REACT | Node.js | Express | MongoDB
