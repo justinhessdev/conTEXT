@@ -10,25 +10,20 @@ const
     bodyParser = require('body-parser'),
     session = require('express-session'),
     MongoDBStore = require('connect-mongodb-session')(session),
-    passport = require('passport')
+    passport = require('passport'),
+    ///////////////
+    passportConfig = require('../client/config/passport.js'),
+    ///////////////
+    userRoutes = require('./routes/users.js')
+
+    // console.log(userRoutes)
+    // console.log(passportConfig);
+    console.log(passport);
 
   // environment port
   const
       port = process.env.PORT || 3000,
       mongoConnectionString = process.env.MONGODB_URL || 'mongodb://localhost/context-app'
-
-  const
-    userSchema = mongoose.Schema({
-      name:String,
-      number:String,
-      email:String,
-      password:String
-    }),
-    User = mongoose.model('User', userSchema)
-
-  mongoose.connect(mongoConnectionString, (err) => {
-    console.log(err || "Connected to MongoDB (context-app)")
-  })
 
   // will store session information as a 'sessions' collection in Mongo
 const store = new MongoDBStore({
@@ -52,16 +47,32 @@ app.set('view engine', 'ejs')
 app.set('views', process.env.PWD+'/client/views');
 app.use(ejsLayouts)
 
+// session + passport
+app.use(session({
+    secret: "boomchakalaka",
+    cookie:{maxAge : 60000000},
+    resave: true,
+    saveUninitialized: false,
+    store: store
+}))
 
-  // send res (response) back to client when client makes get request at root.
-  // response contains sendFile of our client index.html so client/chrome will know to populate page
-  // app.get('/', (req, res) => {
-  //   res.render('/client/views/index')
-  // })
+app.use(passport.initialize())
+app.use(passport.session())
 
-  app.get('/', (req, res) => {
-    res.render('index')
-  })
+app.use((req, res, next) => {
+    app.locals.currentUser = req.user // currentUser now available in ALL views
+    app.locals.loggedIn = !!req.user // a boolean loggedIn now available in ALL views
+
+    next()
+})
+
+app.use('/', userRoutes)
+
+// send res (response) back to client when client makes get request at root.
+// response contains sendFile of our client index.html so client/chrome will know to populate page
+app.get('/', (req, res) => {
+  res.render('index')
+})
 
   // API routes here: as opposed to our /#/ routes
   // app.get('/api/users', (req, res) => {
