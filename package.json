@@ -2,7 +2,7 @@
   "name": "context",
   "version": "1.0.0",
   "description": "## text with conTEXT",
-  "main": "app.js",
+  "main": "client/app.js",
   "dependencies": {
     "react-bootstrap": "^0.30.7"
   },

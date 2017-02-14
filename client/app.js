@@ -217,11 +217,11 @@ const CtxForm = React.createClass({
                   <option value="love">Love you</option>
                   <option value="miss">Miss you</option>
                   <option value="hurt">Feelings hurt</option>
-                  <option value="upset">I'm upset</option>
-                  <option value="upset-you">I'm upset at you</option>
-                  <option value="angry">I'm angry</option>
-                  <option value="angry-you">I'm angry at you</option>
-                  <option value="ignore">I'm ignoring you</option>
+                  <option value="upset">I am upset</option>
+                  <option value="upset-you">I am upset at you</option>
+                  <option value="angry">I am angry</option>
+                  <option value="angry-you">I am angry at you</option>
+                  <option value="ignore">I am ignoring you</option>
                   <option value="food">I want food</option>
                 </select>
                 <br></br>
