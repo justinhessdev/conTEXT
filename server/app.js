@@ -40,6 +40,10 @@ app.get('/', (req, res) => {
   res.sendFile(process.env.PWD + '/client/index.html')
 })
 
+app.get('/login', (req, res) => {
+  res.sendFile(process.env.PWD + '/client/login.html')
+})
+
 // root / index
 app.get('/users', function(req, res) {
     User.find({}, function(err, users) { // we put the find criteria in '{}' --> if empty we are looking for all
