@@ -12,13 +12,13 @@ const
     MongoDBStore = require('connect-mongodb-session')(session),
     passport = require('passport'),
     ///////////////
-    passportConfig = require('../client/config/passport.js'),
+    passportConfig = require('./config/passport.js'),
     ///////////////
     userRoutes = require('./routes/users.js')
 
     // console.log(userRoutes)
     // console.log(passportConfig);
-    console.log(passport);
+    // console.log(passport);
 
   // environment port
   const
