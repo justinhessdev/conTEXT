@@ -5,25 +5,36 @@
     <title>React Intro</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="../css/styles.css">
     <script
       src="https://code.jquery.com/jquery-3.1.1.min.js"
       integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
       crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="vendor/babel-core-5.8.25.js"></script>
-    <script src="vendor/react.js"></script>
-    <script src="vendor/react-dom.js"></script>
+    <script src="../vendor/babel-core-5.8.25.js"></script>
+    <script src="../vendor/react.js"></script>
+    <script src="../vendor/react-dom.js"></script>
 
     <style media="screen">
       img {max-width: 100%;}
     </style>
   </head>
   <body>
+
+    <!-- /views/index.ejs -->
+<div class="text-center col-md-8 col-md-offset-2">
+    <h1><span class="fa fa-lock"></span>NodeJS + Passport</h1>
+    <h3>Login or Sign Up:</h3>
+    <a href="/login" class="btn btn-default">Local Login</a>
+    <a href="/signup" class="btn btn-default">Local Signup</a>
+    <hr>
+    <h4>Or Login With <a href="/auth/facebook" class="btn btn-primary">Facebook</a></h4>
+</div>
+
     <!-- feel free to react -->
     <div id="main"></div>
 
-    <script type="text/babel" src="./app.js"></script>
+    <script type="text/babel" src="../app.js"></script>
 
   </body>
 </html>
