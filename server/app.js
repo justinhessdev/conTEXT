@@ -20,10 +20,14 @@ const
     // console.log(passportConfig);
     // console.log(passport);
 
-  // environment port
-  const
-      port = process.env.PORT || 3000,
-      mongoConnectionString = process.env.MONGODB_URL || 'mongodb://localhost/context-app'
+// environment port
+const
+    port = process.env.PORT || 3000,
+    mongoConnectionString = process.env.MONGODB_URL || 'mongodb://localhost/context-app'
+
+    mongoose.connect(mongoConnectionString, (err) => {
+      console.log(err || "Connected to MongoDB (context-app)")
+    })
 
   // will store session information as a 'sessions' collection in Mongo
 const store = new MongoDBStore({
@@ -74,13 +78,28 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-  // API routes here: as opposed to our /#/ routes
-  // app.get('/api/users', (req, res) => {
-  //   User.find({}, (err, users) => {
-  //     res.json(users)
-  //   })
-  // })
+//////////////////
 
-  app.listen(port, (err) => {
-    console.log(err || "Server running")
-  })
+// root / index
+// app.get('/users', function(req, res) {
+//     User.find({}, function(err, users) { // we put the find criteria in '{}' --> if empty we are looking for all
+//       res.json(users)
+//     })
+// })
+//
+// app.post('/users', function(req, res) {
+//   User.create(req.body, function(err, user) {
+//     res.json(user)
+//   }) // body belongs to body parser middleware
+// })
+
+// API routes here: as opposed to our /#/ routes
+// app.get('/api/users', (req, res) => {
+//   User.find({}, (err, users) => {
+//     res.json(users)
+//   })
+// })
+
+app.listen(port, (err) => {
+  console.log(err || "Server running")
+})
