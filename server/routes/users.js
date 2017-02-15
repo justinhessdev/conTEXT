@@ -32,6 +32,11 @@ userRouter.get('/logout', (req,res) => {
     res.redirect('/')
 })
 
+userRouter.get('/status', (req, res) => {
+  if (!req.isAuthenticated()) return res.status(200).json({ status: false })
+  res.status(200).json({ status: true, user: req.user })
+})
+
 // a method used to authorize a user BEFORE allowing them to proceed to the profile page:
 function isLoggedIn(req, res, next){
     if(req.isAuthenticated()) return next()
