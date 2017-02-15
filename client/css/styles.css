@@ -118,9 +118,14 @@
 }
 
 .show {
-  display: block
+  display: block;
 }
 
 .hide {
-  display: none
+  display: none;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 999;
 }
