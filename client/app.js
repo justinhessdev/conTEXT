@@ -124,7 +124,7 @@ const MessageList = React.createClass({
     })
 
     const divStyle = {
-      border: "1px dotted black",
+      border: "1px solid black",
       marginTop: '5px',
       padding: '10px'
     }
@@ -143,21 +143,26 @@ const MessageList = React.createClass({
 const ConversationList = React.createClass({
   render: function() {
     const conversations = this.props.conversations.map((c) => {
+      const pStyle = {
+          marginTop: '-2px'
+      }
+
         return (
-            <p key={c.id}>{c.to}</p>
+          <div key={c.id}>
+            <hr style={pStyle}></hr>
+            <p className="text-center">{c.to}</p>
+          </div>
         )
     })
 
     const divStyle = {
-      border: "1px dotted black",
-      marginTop: '5px',
+      border: "1px solid black",
       width: '100%'
     }
 
     return (
 
       <div style={divStyle} id="conversations-list">
-        <br></br>
         {conversations}
       </div>
     )
