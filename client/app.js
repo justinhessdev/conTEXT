@@ -17,6 +17,23 @@ const Dashboard = React.createClass({
         {id: 2, user_id: 1, body: "How are you?", context: false, urgent: false, customContext:""},
         {id: 3, user_id: 2, body: "I'm great! Thanks for asking", context: false, urgent: false, customContext:""},
         {id: 4, user_id: 1, body: "😍", context: false, urgent: false, customContext:""}
+      ],
+      conversations: [
+        {id: 1, user_id: 2, to: "Jake"},
+        {id: 2, user_id: 3, to: "Jim"},
+        {id: 3, user_id: 4, to: "Joe"},
+        {id: 4, user_id: 5, to: "James"},
+        {id: 5, user_id: 6, to: "Jeb"},
+        {id: 6, user_id: 7, to: "Jay"},
+        {id: 7, user_id: 8, to: "John"},
+        {id: 8, user_id: 9, to: "Jeff"},
+        {id: 9, user_id: 10, to: "Judd"},
+        {id: 10, user_id: 11, to: "Jules"},
+        {id: 11, user_id: 12, to: "Jess"},
+        {id: 12, user_id: 13, to: "Jillian"},
+        {id: 13, user_id: 14, to: "Joelle"},
+        {id: 14, user_id: 15, to: "Jolene"},
+        {id: 15, user_id: 16, to: "Jeter"}
       ]
     }
   },
@@ -40,11 +57,21 @@ const Dashboard = React.createClass({
 
   render: function() {
     if(this.state.isLoggedIn) { setTimeout(this.lockForm, 5000) }
+    const divStyle = {
+      float: "left"
+    }
     return (
       <div id="dashboard">
-        <MessageList messages={this.state.messages}/>
-        <MessageForm onSubmit={this.createMessage}/>
-        <CtxForm onSubmit={this.createMessage}/>
+         <div className="row">
+             <div className="col-xs-3">
+               <ConversationList conversations={this.state.conversations}/>
+             </div>
+             <div className="col-xs-9">
+              <MessageList messages={this.state.messages}/>
+              <MessageForm onSubmit={this.createMessage}/>
+              <CtxForm onSubmit={this.createMessage}/>
+            </div>
+        </div>
       </div>
     )
   }
@@ -103,14 +130,36 @@ const MessageList = React.createClass({
     }
 
     return (
-    <div className="row">
-      <div className="col-md-6 col-md-offset-1 ">
+
         <div style={divStyle} id="message-list">
           <br></br>
           {messages}
         </div>
+
+    )
+  }
+})
+
+const ConversationList = React.createClass({
+  render: function() {
+    const conversations = this.props.conversations.map((c) => {
+        return (
+            <p key={c.id}>{c.to}</p>
+        )
+    })
+
+    const divStyle = {
+      border: "1px dotted black",
+      marginTop: '5px',
+      width: '100%'
+    }
+
+    return (
+
+      <div style={divStyle} id="conversations-list">
+        <br></br>
+        {conversations}
       </div>
-    </div>
     )
   }
 })
@@ -140,14 +189,12 @@ const MessageForm = React.createClass({
         <br></br>
 
         <form onSubmit={this.handleSubmit}>
-          <div className="col-md-6 col-md-offset-1">
-            <label className="sr-only" htmlFor="ex3">send message</label>
-            <div className="input-group">
-              <input className="form-control" id="ex3" type='text' ref='newMessage' placeholder="send message - press enter"/>
-              <div className="input-group-addon" onClick={this.showContextModal}>conTEXT</div>
-            </div>
-          </div>
-          <button className="btn btn-primary sr-only" onClick={this.handleSubmit}>Submit</button>
+              <label className="sr-only" htmlFor="ex3">send message</label>
+              <div className="input-group">
+                <input className="form-control" id="ex3" type='text' ref='newMessage' placeholder="send message - press enter"/>
+                <div className="input-group-addon" onClick={this.showContextModal}>conTEXT</div>
+              </div>
+            <button className="btn btn-primary sr-only" onClick={this.handleSubmit}>Submit</button>
         </form>
       </div>
     )
@@ -204,34 +251,33 @@ const CtxForm = React.createClass({
     return (
       <div id='ctx-form'>
         <form onSubmit={this.handleSubmit}>
-          <div className="col-md-6 col-md-offset-1">
-            <div className="form-group">
-              <div id="ctxBorder">
-                <label htmlFor="ctx-area">What do you want to talk about?</label>
-                <textarea className="form-control"  id="ctx-area" ref='ctxMessage' rows="2"></textarea>
-                <br></br>
-                <label htmlFor="ctxSelect">Send custom context</label>
-                <select id="ctxSelect" value={this.state.value} onChange={this.handleChange}>
-                  <option value="blank" ></option>
-                  <option value="thinking">Thinking of you</option>
-                  <option value="love">Love you</option>
-                  <option value="miss">Miss you</option>
-                  <option value="hurt">Feelings hurt</option>
-                  <option value="upset">I am upset</option>
-                  <option value="upset-you">I am upset at you</option>
-                  <option value="angry">I am angry</option>
-                  <option value="angry-you">I am angry at you</option>
-                  <option value="ignore">I am ignoring you</option>
-                  <option value="food">I want food</option>
-                </select>
-                <br></br>
-                <label htmlFor="urgent">Make it urgent</label>
-                <button id="urgentButton" type="button" className="btn btn-default" onClick={this.handleUrgent}>Urgent</button>
-                <button id="sendContextButton" type="button" className="btn btn-primary pull-right" onClick={this.handleSubmit}>Send</button>
-                <button type="button" className="btn btn-default pull-right" onClick={this.handleClose}>Close</button>
-              </div>
-            </div>
-          </div>
+              <div className="form-group">
+                <div id="ctxBorder">
+                  <label htmlFor="ctx-area">What do you want to talk about?</label>
+                  <textarea className="form-control"  id="ctx-area" ref='ctxMessage' rows="2"></textarea>
+                  <br></br>
+                  <label htmlFor="ctxSelect">Send custom context</label>
+                  <select id="ctxSelect" value={this.state.value} onChange={this.handleChange}>
+                    <option value="blank" ></option>
+                    <option value="thinking">Thinking of you</option>
+                    <option value="love">Love you</option>
+                    <option value="miss">Miss you</option>
+                    <option value="hurt">Feelings hurt</option>
+                    <option value="upset">I am upset</option>
+                    <option value="upset-you">I am upset at you</option>
+                    <option value="angry">I am angry</option>
+                    <option value="angry-you">I am angry at you</option>
+                    <option value="ignore">I am ignoring you</option>
+                    <option value="food">I want food</option>
+                  </select>
+                  <br></br>
+                  <label htmlFor="urgent">Make it urgent</label>
+                  <button id="urgentButton" type="button" className="btn btn-default" onClick={this.handleUrgent}>Urgent</button>
+                  <button id="sendContextButton" type="button" className="btn btn-primary pull-right" onClick={this.handleSubmit}>Send</button>
+                  <button type="button" className="btn btn-default pull-right" onClick={this.handleClose}>Close</button>
+                </div>
+
+        </div>
         </form>
       </div>
     )

@@ -129,3 +129,8 @@
   position: absolute;
   z-index: 999;
 }
+
+.convos {
+  color: red;
+  border: 1px dotted black
+}

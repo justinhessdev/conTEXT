@@ -14,7 +14,8 @@ const
     ///////////////
     passportConfig = require('./config/passport.js'),
     ///////////////
-    userRoutes = require('./routes/users.js')
+    userRoutes = require('./routes/users.js'),
+    Message = require('./models/Message.js')
 
     // console.log(userRoutes)
     // console.log(passportConfig);
@@ -100,6 +101,11 @@ app.get('/', (req, res) => {
 //   })
 // })
 
+app.get('/message-test', (req, res) => {
+  Message.find({}, (err, message) => {
+    res.json(message)
+  })
+})
 app.listen(port, (err) => {
   console.log(err || "Server running")
 })
