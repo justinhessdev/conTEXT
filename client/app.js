@@ -19,13 +19,28 @@ const Dashboard = React.createClass({
         {id: 4, user_id: "58a39219fc4c98025a646ff1", body: "😍", context: false, urgent: false, customContext:""}
       ],
       conversations: [],
-      currentConversation: 0
+      currentConversation: 0,
+      currentUser: "",
+      to: ""
     }
   },
 
   componentWillMount: function() {
-      const sendSearch = fetch('/conversations', {credentials: 'same-origin'})
+      const currentUserLoggedIn = fetch('/status', {credentials: 'same-origin'})
+
       var self = this
+
+      function grabUserId(data) {
+        data.json().then((jsonData) => {
+          console.log(jsonData)
+          if(!jsonData.status) {
+            window.location = '/login'
+          }
+          self.setState({
+            currentUser: jsonData.user._id
+          })
+        }).then(proceedIfLoggedIn)
+      }
 
       function loadMyUsers(data) {
         data.json().then((jsonData) => {
@@ -34,7 +49,14 @@ const Dashboard = React.createClass({
         })
       }
 
-      sendSearch.then(loadMyUsers)
+      function proceedIfLoggedIn() {
+        const sendSearch = fetch('/conversations', {credentials: 'same-origin'})
+
+        sendSearch.then(loadMyUsers)
+      }
+
+      currentUserLoggedIn.then(grabUserId)
+
 
   },
 
@@ -45,12 +67,12 @@ const Dashboard = React.createClass({
       isLoggedIn: false,
       messages: [
         ...this.state.messages,
-        {id: id, user_id: "58a39219fc4c98025a646ff1", body: body, context: context, urgent: urgent, customContext: customContext}
+        {id: id, user_id: this.state.currentUser, body: body, context: context, urgent: urgent, customContext: customContext}
       ]
     })
   },
 
-  getDataFromConversation: function(messages, context, urgent, customContext) {
+  getDataFromConversation: function(user1, user2, messages, context, urgent, customContext) {
     var newMessages = []
     messages.map((message) => {
       newMessages.push({id: message._id, user_id:message._author._id, body: message.body, context: context, urgent: urgent, customContext: customContext})
@@ -58,14 +80,18 @@ const Dashboard = React.createClass({
     })
 
     this.setState({
-      messages: newMessages
+      messages: newMessages,
+      to: user2._id
     })
+
+    console.log("In conversation sending to: ")
+    console.log(this.state.to)
   },
 
   showConversationNames: function(names) {
     var conversationNames = []
     names.map((n) => {
-      conversationNames.push({id: n._id, user2: n.user2})
+      conversationNames.push({id: n._id, user2: n.user2.local.name})
     })
 
     this.setState({
@@ -93,11 +119,11 @@ const Dashboard = React.createClass({
          <div className="row">
              <div className="col-xs-3">
                <NewConversation showConversations={this.showConversations}/>
-               <ConversationList conversations={this.state.conversations} getDataFromConversation={this.getDataFromConversation} currentConversation={this.handleCurrentConversation} />
+               <ConversationList conversations={this.state.conversations} getDataFromConversation={this.getDataFromConversation} currentConversation={this.handleCurrentConversation} currentUser={this.state.currentUser} sendTo={this.state.to}/>
              </div>
              <div className="col-xs-9">
-              <MessageList messages={this.state.messages}/>
-              <MessageForm onSubmit={this.createMessage} messages={this.state.messages} currentConversation={this.state.currentConversation}/>
+              <MessageList messages={this.state.messages} currentUser={this.state.currentUser}/>
+              <MessageForm onSubmit={this.createMessage} messages={this.state.messages} currentConversation={this.state.currentConversation} currentUser={this.state.currentUser} sendTo={this.state.to}/>
               <CtxForm onSubmit={this.createMessage}/>
             </div>
         </div>
@@ -177,13 +203,13 @@ const MessageList = React.createClass({
 
       // console.log(urgentClass)
 
-      if(m.user_id != '58a39219fc4c98025a646ff1') {
+      if(m.user_id != this.props.currentUser) {
         return (
           <div key={m.id} className="clearfix">
             <p className="bubble">{m.body}</p>
           </div>
         )
-      } else if (m.user_id == '58a39219fc4c98025a646ff1' && m.context) {
+      } else if (m.user_id == this.props.currentUser && m.context) {
         return (
           <div key={m.id} className="clearfix">
             <div className="bubble bubble--alt">
@@ -230,8 +256,8 @@ const ConversationList = React.createClass({
 
     function loadMyConversation(data) {
       data.json().then((jsonData) => {
-        // console.log(jsonData.messages)
-        self.props.getDataFromConversation(jsonData.messages, false, 0, "")
+        console.log(jsonData)
+        self.props.getDataFromConversation(jsonData.user1, jsonData.user2, jsonData.messages, false, 0, "")
       })
     }
 
@@ -282,8 +308,8 @@ const MessageForm = React.createClass({
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        _author: "58a39219fc4c98025a646ff1",
-         to: "58a3a774c8a707068b15dd1c",
+        _author: this.props.currentUser,
+         to: this.props.sendTo,
          body: this.refs.newMessage.value
       })
     })
@@ -318,8 +344,8 @@ const MessageForm = React.createClass({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-           user1: "JJ",
-           user2: "DD",
+           user1: self.props.currentUser,
+           user2: self.props.sendTo,
            messages: ids
         })
       })

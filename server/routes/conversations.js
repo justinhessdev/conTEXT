@@ -23,10 +23,8 @@ conversationRouter.route('/:id')
     })
   })
   .patch((req, res) => {
-    console.log("The body of the patch request is: ")
-    console.log(req.body)
     // console.log(req.params.id)
-    Conversation.findByIdAndUpdate(req.params.id, req.body, (err, conversation) => {
+    Conversation.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, conversation) => {
     // respond here
     console.log("The patched conversation is: ")
     console.log(conversation)
