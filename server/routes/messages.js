@@ -10,13 +10,9 @@ messageRouter.route('/')
       })
     })
     .post((req, res) => {
-      // console.log(res)
-      console.log(req.body)
       var newMessage = new Message(req.body)
-      // console.log(newMessage)
       newMessage.save((err, message) => {
         if(err) console.log(err)
-        // console.log(message)
         res.json(message)
       })
     })

@@ -18,7 +18,8 @@ const Dashboard = React.createClass({
         {id: 3, user_id: "58a3a774c8a707068b15dd1c", body: "I'm great! Thanks for asking", context: false, urgent: false, customContext:""},
         {id: 4, user_id: "58a39219fc4c98025a646ff1", body: "😍", context: false, urgent: false, customContext:""}
       ],
-      conversations: []
+      conversations: [],
+      currentConversation: 0
     }
   },
 
@@ -39,12 +40,12 @@ const Dashboard = React.createClass({
 
   // .map will return new array based on original one, formated how we choose
 
-  createMessage: function(body, context, urgent, customContext) {
+  createMessage: function(id, body, context, urgent, customContext) {
     this.setState({
       isLoggedIn: false,
       messages: [
         ...this.state.messages,
-        {id: this.state.messages.length + 1, user_id: "58a39219fc4c98025a646ff1", body: body, urgent: 0, context: context, urgent: urgent, customContext: customContext}
+        {id: id, user_id: "58a39219fc4c98025a646ff1", body: body, context: context, urgent: urgent, customContext: customContext}
       ]
     })
   },
@@ -52,7 +53,7 @@ const Dashboard = React.createClass({
   getDataFromConversation: function(messages, context, urgent, customContext) {
     var newMessages = []
     messages.map((message) => {
-      newMessages.push({id: message._id, user_id:message._author._id, body: message.body, urgent: 0, context: context, urgent: urgent, customContext: customContext})
+      newMessages.push({id: message._id, user_id:message._author._id, body: message.body, context: context, urgent: urgent, customContext: customContext})
 
     })
 
@@ -78,6 +79,10 @@ const Dashboard = React.createClass({
     })
   },
 
+  handleCurrentConversation: function(id) {
+    this.setState({currentConversation: id})
+  },
+
   render: function() {
     if(this.state.isLoggedIn) { setTimeout(this.lockForm, 5000) }
     const divStyle = {
@@ -88,11 +93,11 @@ const Dashboard = React.createClass({
          <div className="row">
              <div className="col-xs-3">
                <NewConversation showConversations={this.showConversations}/>
-               <ConversationList conversations={this.state.conversations} getDataFromConversation={this.getDataFromConversation} />
+               <ConversationList conversations={this.state.conversations} getDataFromConversation={this.getDataFromConversation} currentConversation={this.handleCurrentConversation} />
              </div>
              <div className="col-xs-9">
               <MessageList messages={this.state.messages}/>
-              <MessageForm onSubmit={this.createMessage}/>
+              <MessageForm onSubmit={this.createMessage} messages={this.state.messages} currentConversation={this.state.currentConversation}/>
               <CtxForm onSubmit={this.createMessage}/>
             </div>
         </div>
@@ -219,6 +224,7 @@ const MessageList = React.createClass({
 const ConversationList = React.createClass({
 
   loadConversation: function(id) {
+    this.props.currentConversation(id)
     const sendSearch = fetch('/conversations/' + id)
     var self = this
 
@@ -283,16 +289,44 @@ const MessageForm = React.createClass({
     })
 
     var self = this
+    var id
 
-    function loadMyUsers(data) {
+    function loadMyMessage(data) {
       data.json().then((jsonData) => {
-        console.log(jsonData);
-        self.props.onSubmit(self.refs.newMessage.value, false, false)
+        // console.log(jsonData);
+        id = jsonData._id
+        // console.log(id);
+        self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
         self.refs.newMessage.value = ''
+      }).then(patchConversation)
+    }
+
+    function patchConversation() {
+      var ids = []
+      self.props.messages.map((message) => {
+        console.log(message)
+         ids.push(message.id)
+      })
+
+      console.log(ids)
+      console.log("the current conversation is: ")
+      console.log(self.props.currentConversation)
+      const patchSearch = fetch('/conversations/'+self.props.currentConversation, {
+        method: 'PATCH',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+           user1: "JJ",
+           user2: "DD",
+           messages: ids
+        })
       })
     }
 
-    sendSearch.then(loadMyUsers)
+    // patchSearch.then(loadPatch)
+    sendSearch.then(loadMyMessage)
 
 
   },
