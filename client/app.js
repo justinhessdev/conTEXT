@@ -44,31 +44,31 @@ const Dashboard = React.createClass({
       isLoggedIn: false,
       messages: [
         ...this.state.messages,
-        {id: this.state.messages.length + 1, user_id:1, body: body, urgent: 0, context: context, urgent: urgent, customContext: customContext}
+        {id: this.state.messages.length + 1, user_id: "58a39219fc4c98025a646ff1", body: body, urgent: 0, context: context, urgent: urgent, customContext: customContext}
       ]
     })
   },
 
   getDataFromConversation: function(messages, context, urgent, customContext) {
-    console.log(messages)
+    var newMessages = []
     messages.map((message) => {
-      this.setState({
-        messages: [
-          ...this.state.messages,
-          {id: message._id, user_id:message._author._id, body: message.body, urgent: 0, context: context, urgent: urgent, customContext: customContext}
-        ]
-      })
+      newMessages.push({id: message._id, user_id:message._author._id, body: message.body, urgent: 0, context: context, urgent: urgent, customContext: customContext})
+
+    })
+
+    this.setState({
+      messages: newMessages
     })
   },
 
   showConversationNames: function(names) {
+    var conversationNames = []
     names.map((n) => {
-      this.setState({
-        conversations: [
-          ...this.state.conversations,
-          {id: n._id, user2: n.user2}
-        ]
-      })
+      conversationNames.push({id: n._id, user2: n.user2})
+    })
+
+    this.setState({
+      conversations: conversationNames
     })
   },
 
@@ -172,7 +172,7 @@ const MessageList = React.createClass({
 
       // console.log(urgentClass)
 
-      if(m.user_id == '58a3a774c8a707068b15dd1c') {
+      if(m.user_id != '58a39219fc4c98025a646ff1') {
         return (
           <div key={m.id} className="clearfix">
             <p className="bubble">{m.body}</p>
@@ -219,8 +219,6 @@ const MessageList = React.createClass({
 const ConversationList = React.createClass({
 
   loadConversation: function(id) {
-    console.log(id)
-    console.log("Gonna load the convos soon biznatch")
     const sendSearch = fetch('/conversations/' + id)
     var self = this
 
@@ -270,8 +268,33 @@ const ConversationList = React.createClass({
 const MessageForm = React.createClass({
   handleSubmit: function(evt) {
     evt.preventDefault()
-    this.props.onSubmit(this.refs.newMessage.value, false, false)
-    this.refs.newMessage.value = ''
+
+    const sendSearch = fetch('/messages', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        _author: "58a39219fc4c98025a646ff1",
+         to: "58a3a774c8a707068b15dd1c",
+         body: this.refs.newMessage.value
+      })
+    })
+
+    var self = this
+
+    function loadMyUsers(data) {
+      data.json().then((jsonData) => {
+        console.log(jsonData);
+        self.props.onSubmit(self.refs.newMessage.value, false, false)
+        self.refs.newMessage.value = ''
+      })
+    }
+
+    sendSearch.then(loadMyUsers)
+
+
   },
 
   showContextModal: function() {

@@ -10,8 +10,24 @@ messageRouter.route('/')
       })
     })
     .post((req, res) => {
+      // console.log(res)
+      console.log(req.body)
       var newMessage = new Message(req.body)
-      newMessage.save((err, message) => res.json(message))
+      // console.log(newMessage)
+      newMessage.save((err, message) => {
+        if(err) console.log(err)
+        // console.log(message)
+        res.json(message)
+      })
     })
+
+
+messageRouter.route('/:id')
+  .get((req,res) => {
+    Message.findById(req.params.id , (err, message) =>{
+      if (err) console.log(err)
+      res.json(message)
+    })
+  })
 
 module.exports = messageRouter
