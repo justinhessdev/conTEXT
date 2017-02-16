@@ -15,7 +15,8 @@ const
     passportConfig = require('./config/passport.js'),
     ///////////////
     userRoutes = require('./routes/users.js'),
-    Message = require('./models/Message.js')
+    conversationRoutes = require('./routes/conversations.js')
+    messageRoutes = require('./routes/messages.js')
 
     // console.log(userRoutes)
     // console.log(passportConfig);
@@ -72,6 +73,8 @@ app.use((req, res, next) => {
 })
 
 app.use('/', userRoutes)
+app.use('/conversations', conversationRoutes)
+app.use('/messages', messageRoutes)
 
 // send res (response) back to client when client makes get request at root.
 // response contains sendFile of our client index.html so client/chrome will know to populate page
@@ -81,19 +84,6 @@ app.get('/', (req, res) => {
 
 //////////////////
 
-// root / index
-// app.get('/users', function(req, res) {
-//     User.find({}, function(err, users) { // we put the find criteria in '{}' --> if empty we are looking for all
-//       res.json(users)
-//     })
-// })
-//
-// app.post('/users', function(req, res) {
-//   User.create(req.body, function(err, user) {
-//     res.json(user)
-//   }) // body belongs to body parser middleware
-// })
-
 // API routes here: as opposed to our /#/ routes
 // app.get('/api/users', (req, res) => {
 //   User.find({}, (err, users) => {
@@ -101,11 +91,6 @@ app.get('/', (req, res) => {
 //   })
 // })
 
-app.get('/message-test', (req, res) => {
-  Message.find({}, (err, message) => {
-    res.json(message)
-  })
-})
 app.listen(port, (err) => {
   console.log(err || "Server running")
 })

@@ -13,30 +13,30 @@ const Dashboard = React.createClass({
     return {
       isLoggedIn: true,
       messages: [
-        {id: 1, user_id: 1, body: "Hey there", context: false, urgent: false, customContext:""},
-        {id: 2, user_id: 1, body: "How are you?", context: false, urgent: false, customContext:""},
-        {id: 3, user_id: 2, body: "I'm great! Thanks for asking", context: false, urgent: false, customContext:""},
-        {id: 4, user_id: 1, body: "😍", context: false, urgent: false, customContext:""}
+        {id: 1, user_id: "58a39219fc4c98025a646ff1", body: "Hey there", context: false, urgent: false, customContext:""},
+        {id: 2, user_id: "58a39219fc4c98025a646ff1", body: "How are you?", context: false, urgent: false, customContext:""},
+        {id: 3, user_id: "58a3a774c8a707068b15dd1c", body: "I'm great! Thanks for asking", context: false, urgent: false, customContext:""},
+        {id: 4, user_id: "58a39219fc4c98025a646ff1", body: "😍", context: false, urgent: false, customContext:""}
       ],
-      conversations: [
-        {id: 1, user_id: 2, to: "Jake"},
-        {id: 2, user_id: 3, to: "Jim"},
-        {id: 3, user_id: 4, to: "Joe"},
-        {id: 4, user_id: 5, to: "James"},
-        {id: 5, user_id: 6, to: "Jeb"},
-        {id: 6, user_id: 7, to: "Jay"},
-        {id: 7, user_id: 8, to: "John"},
-        {id: 8, user_id: 9, to: "Jeff"},
-        {id: 9, user_id: 10, to: "Judd"},
-        {id: 10, user_id: 11, to: "Jules"},
-        {id: 11, user_id: 12, to: "Jess"},
-        {id: 12, user_id: 13, to: "Jillian"},
-        {id: 13, user_id: 14, to: "Joelle"},
-        {id: 14, user_id: 15, to: "Jolene"},
-        {id: 15, user_id: 16, to: "Jeter"}
-      ]
+      conversations: []
     }
   },
+
+  componentWillMount: function() {
+      const sendSearch = fetch('/conversations', {credentials: 'same-origin'})
+      var self = this
+
+      function loadMyUsers(data) {
+        data.json().then((jsonData) => {
+          self.showConversationNames(jsonData)
+
+        })
+      }
+
+      sendSearch.then(loadMyUsers)
+
+  },
+
   // .map will return new array based on original one, formated how we choose
 
   createMessage: function(body, context, urgent, customContext) {
@@ -46,7 +46,30 @@ const Dashboard = React.createClass({
         ...this.state.messages,
         {id: this.state.messages.length + 1, user_id:1, body: body, urgent: 0, context: context, urgent: urgent, customContext: customContext}
       ]
-    }, () => console.log(this.state.messages[this.state.messages.length-1]))
+    })
+  },
+
+  getDataFromConversation: function(messages, context, urgent, customContext) {
+    console.log(messages)
+    messages.map((message) => {
+      this.setState({
+        messages: [
+          ...this.state.messages,
+          {id: message._id, user_id:message._author._id, body: message.body, urgent: 0, context: context, urgent: urgent, customContext: customContext}
+        ]
+      })
+    })
+  },
+
+  showConversationNames: function(names) {
+    names.map((n) => {
+      this.setState({
+        conversations: [
+          ...this.state.conversations,
+          {id: n._id, user2: n.user2}
+        ]
+      })
+    })
   },
 
   lockForm: function() {
@@ -64,7 +87,8 @@ const Dashboard = React.createClass({
       <div id="dashboard">
          <div className="row">
              <div className="col-xs-3">
-               <ConversationList conversations={this.state.conversations}/>
+               <NewConversation showConversations={this.showConversations}/>
+               <ConversationList conversations={this.state.conversations} getDataFromConversation={this.getDataFromConversation} />
              </div>
              <div className="col-xs-9">
               <MessageList messages={this.state.messages}/>
@@ -77,11 +101,63 @@ const Dashboard = React.createClass({
   }
 })
 
+const NewConversation = React.createClass({
+
+  startNewConversation: function() {
+  //   const sendSearch = fetch('/users', {credentials: 'same-origin'})
+  //   var self = this
+  //
+  //   function loadMyUsers(data) {
+  //     data.json().then((jsonData) => {
+  //       // console.log(jsonData)
+  //       self.props.showConversations(jsonData)
+  //
+  //       self.setState({
+  //         conversations: jsonData
+  //       })
+  //     })
+  //   }
+  //
+  //   sendSearch.then(loadMyUsers)
+  },
+
+  render: function() {
+
+    const bStyle= {
+      border:'0px solid transparent'
+    }
+
+    const styling = {
+      border: '1px solid black',
+      padding: '5px',
+      marginBottom: '1px',
+      marginLeft: '1px',
+      marginRight: '1px',
+      marginTop: '5px'
+
+    }
+
+    return (
+      <div style={styling} className="row">
+          <div className='col-md-6 col-md-offset-3'>
+            <h5 className='text-center'>Chats</h5>
+          </div>
+          <div className='col-xs-3'>
+            <button style={bStyle} type="button" className="btn btn-default" onClick={this.startNewConversation} aria-label="Left Align">
+              <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+          </div>
+      </div>
+    )
+  }
+})
+
 // props: we pass down properties to child components and unchangeable
 // based on same data store
 // props are declared as attributes on our <MessageList tag
 // this is stateless component
 // extremely powerful when we want to create plug and play stuff
+
 const MessageList = React.createClass({
   render: function() {
     const messages = this.props.messages.map((m) => {
@@ -94,15 +170,15 @@ const MessageList = React.createClass({
         urgentSpan='hide'
       }
 
-      console.log(urgentClass)
+      // console.log(urgentClass)
 
-      if(m.user_id == '2') {
+      if(m.user_id == '58a3a774c8a707068b15dd1c') {
         return (
           <div key={m.id} className="clearfix">
-            <p key={m.id} className="bubble">{m.body}</p>
+            <p className="bubble">{m.body}</p>
           </div>
         )
-      } else if (m.user_id == '1' && m.context) {
+      } else if (m.user_id == '58a39219fc4c98025a646ff1' && m.context) {
         return (
           <div key={m.id} className="clearfix">
             <div className="bubble bubble--alt">
@@ -117,7 +193,7 @@ const MessageList = React.createClass({
       } else {
          return (
            <div key={m.id} className="clearfix">
-             <p key={m.id} className="bubble bubble--alt">{m.body}</p>
+             <p className="bubble bubble--alt">{m.body}</p>
            </div>
          )
       }
@@ -141,16 +217,34 @@ const MessageList = React.createClass({
 })
 
 const ConversationList = React.createClass({
+
+  loadConversation: function(id) {
+    console.log(id)
+    console.log("Gonna load the convos soon biznatch")
+    const sendSearch = fetch('/conversations/' + id)
+    var self = this
+
+    function loadMyConversation(data) {
+      data.json().then((jsonData) => {
+        // console.log(jsonData.messages)
+        self.props.getDataFromConversation(jsonData.messages, false, 0, "")
+      })
+    }
+
+    sendSearch.then(loadMyConversation)
+  },
+
   render: function() {
+
     const conversations = this.props.conversations.map((c) => {
       const pStyle = {
           marginTop: '-2px'
       }
 
         return (
-          <div key={c.id}>
+          <div onClick={() => this.loadConversation(c.id)} key={c.id}>
             <hr style={pStyle}></hr>
-            <p className="text-center">{c.to}</p>
+            <p className="text-center">{c.user2}</p>
           </div>
         )
     })

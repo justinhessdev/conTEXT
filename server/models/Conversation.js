@@ -5,7 +5,7 @@ const
             user1: {type: String},
             user2: {type: String},
             messages: [{type: mongoose.Schema.Types.ObjectId, ref: 'Message'}]
-    }, {timestamps: true}))
+    }, {timestamps: true})
 
 conversationSchema.pre('findOne', function() {
   this.populate('messages')

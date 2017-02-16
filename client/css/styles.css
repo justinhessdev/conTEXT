@@ -132,5 +132,9 @@
 
 .convos {
   color: red;
-  border: 1px dotted black
+  border: 1px dotted black;
+}
+
+.basicBorder {
+  border: 1px solid black;
 }

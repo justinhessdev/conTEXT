@@ -2,7 +2,8 @@
 const
     express = require('express'),
     passport = require('passport'),
-    userRouter = express.Router()
+    userRouter = express.Router(),
+    User = require('../models/User.js')
 
 userRouter.route('/login')
     .get((req,res) => {
@@ -35,6 +36,13 @@ userRouter.get('/logout', (req,res) => {
 userRouter.get('/status', (req, res) => {
   if (!req.isAuthenticated()) return res.status(200).json({ status: false })
   res.status(200).json({ status: true, user: req.user })
+})
+
+///////////////////////////////////////////
+userRouter.get('/users', isLoggedIn, (req, res) => {
+  User.find({}, (err, users) => {
+    res.json(users)
+  })
 })
 
 // a method used to authorize a user BEFORE allowing them to proceed to the profile page:
