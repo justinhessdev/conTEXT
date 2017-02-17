@@ -20,17 +20,17 @@ conversationRouter.route('/')
 
         User.findById(conversation.user1, (err, user) => {
           if (err) console.log(err)
-          console.log("User 1 is")
+          // console.log("User 1 is")
           user1 = user
-          console.log(user1)
+          // console.log(user1)
 
 
 
           User.findById(conversation.user2, (err, user) => {
             if (err) console.log(err)
-            console.log("User 2 is")
+            // console.log("User 2 is")
             user2 = user
-            console.log(user2)
+            // console.log(user2)
 
             conversation.user1 = user1
             conversation.user2 = user2
@@ -58,8 +58,8 @@ conversationRouter.route('/:id')
     // console.log(req.params.id)
     Conversation.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, conversation) => {
     // respond here
-    console.log("The patched conversation is: ")
-    console.log(conversation)
+    // console.log("The patched conversation is: ")
+    // console.log(conversation)
     if (err) console.log(err)
     res.json(conversation)
   })

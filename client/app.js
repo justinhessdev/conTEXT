@@ -74,6 +74,13 @@ const Dashboard = React.createClass({
   // .map will return new array based on original one, formated how we choose
 
   createMessage: function(id, body, context, urgent, customContext) {
+    // console.log("We are sending the context from ctx form here to dashboard and showing id, body, context, urgent, custom context")
+    // console.log(id)
+    // console.log(body)
+    // console.log(context)
+    // console.log(urgent)
+    // console.log(customContext)
+
     this.setState({
       isLoggedIn: false,
       messages: [
@@ -83,12 +90,15 @@ const Dashboard = React.createClass({
     })
   },
 
-  getDataFromConversation: function(user1, user2, messages, context, urgent, customContext) {
+  getDataFromConversation: function(user1, user2, messages) {
     var newMessages = []
     messages.map((message) => {
-      newMessages.push({id: message._id, user_id:message._author._id, body: message.body, context: context, urgent: urgent, customContext: customContext})
+      newMessages.push({id: message._id, user_id:message._author._id, body: message.body, context: message.context, urgent: message.urgent, customContext: message.customContext})
 
     })
+
+    // console.log("Here we are loading all messages from conversation")
+    // console.log(newMessages)
 
     this.setState({
       messages: newMessages,
@@ -136,8 +146,8 @@ const Dashboard = React.createClass({
   },
 
   updateConversationList: function(conversation) {
-    console.log("I am adding the new converstaion to state conversations: ")
-    console.log(conversation)
+    // console.log("I am adding the new converstaion to state conversations: ")
+    // console.log(conversation)
     var updateConvoArr = []
     this.state.conversations.map((c) => {
       updateConvoArr.push(c)
@@ -152,7 +162,7 @@ const Dashboard = React.createClass({
 
     // console.log("There should be a new conversation now: ")
     // console.log("Array size is now: " + this.state.conversations.length)
-    console.log(this.state.conversations)
+    // console.log(this.state.conversations)
   },
 
   startConvoWith: function(user) {
@@ -177,7 +187,7 @@ const Dashboard = React.createClass({
              <div className="col-xs-9">
               <MessageList messages={this.state.messages} currentUser={this.state.currentUser} />
               <MessageForm onSubmit={this.createMessage} messages={this.state.messages} currentConversation={this.state.currentConversation} currentUser={this.state.currentUser} sendTo={this.state.to}/>
-              <CtxForm onSubmit={this.createMessage}/>
+              <CtxForm onSubmit={this.createMessage} messages={this.state.messages} currentConversation={this.state.currentConversation} currentUser={this.state.currentUser} sendTo={this.state.to}/>
             </div>
         </div>
       </div>
@@ -242,6 +252,8 @@ const NewConversation = React.createClass({
 const MessageList = React.createClass({
   render: function() {
     const messages = this.props.messages.map((m) => {
+      // console.log("in messagelist - Now that we have sent message to db and added it to state let's print it out")
+      // console.log(m)
       var urgentClass, urgentSpan
       if(m.urgent) {
         urgentClass='red'
@@ -252,8 +264,19 @@ const MessageList = React.createClass({
       }
 
       // console.log(urgentClass)
-
-      if(m.user_id != this.props.currentUser) {
+      if (m.user_id != this.props.currentUser && m.context) {
+        return (
+          <div key={m.id} className="clearfix">
+            <div className="bubble">
+              <div className={urgentClass}>
+                <p><span className={urgentSpan}>URGENT</span>This message has conTEXT</p>
+                <p>{m.customContext}</p>
+                <p>{m.body}</p>
+              </div>
+            </div>
+          </div>
+        )
+      } else if(m.user_id != this.props.currentUser) {
         return (
           <div key={m.id} className="clearfix">
             <p className="bubble">{m.body}</p>
@@ -309,7 +332,7 @@ const ConversationList = React.createClass({
     function loadMyConversation(data) {
       data.json().then((jsonData) => {
         // console.log(jsonData)
-        self.props.getDataFromConversation(jsonData.user1, jsonData.user2, jsonData.messages, false, 0, "")
+        self.props.getDataFromConversation(jsonData.user1, jsonData.user2, jsonData.messages)
       })
     }
 
@@ -380,8 +403,8 @@ const SelectUserForNewConversation = React.createClass({
 
       self.props.startConvoWith(user2)
       data.json().then((jsonData) => {
-        console.log("The new conversation is: ")
-        console.log(jsonData)
+        // console.log("The new conversation is: ")
+        // console.log(jsonData)
         self.props.addConversation(jsonData.conversation)
 
         $('#conversations-list').show()
@@ -548,20 +571,80 @@ const CtxForm = React.createClass({
   },
 
   handleSubmit: function(evt) {
+    var cc = $("#ctxSelect option:selected").text()
     evt.preventDefault()
-    var customctx = $("#ctxSelect option:selected").text()
-    this.props.onSubmit(this.refs.ctxMessage.value, true, this.state.isUrgent, customctx)
-    this.refs.ctxMessage.value = ''
-    this.setState({isUrgent: false, value: 'blank'})
-    $('#ctxBorder').removeClass('red')
-    $('#ctx-form').hide()
-    $('#message-form').show()
+
+
+        var self = this
+        var id
+
+    const sendSearch = fetch('/messages', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        _author: self.props.currentUser,
+         to: self.props.sendTo,
+         body: self.refs.ctxMessage.value,
+         context: true,
+         urgent: self.state.isUrgent,
+         customContext: cc
+      })
+    })
+
+
+    function loadMyMessage(data) {
+      data.json().then((jsonData) => {
+        // console.log("The message we received from server is: ")
+        // console.log(jsonData)
+        id = jsonData._id
+        // console.log(id);
+        var customctx = $("#ctxSelect option:selected").text()
+        self.props.onSubmit(id, self.refs.ctxMessage.value, true, self.state.isUrgent, customctx)
+        self.refs.ctxMessage.value = ''
+        self.setState({isUrgent: false, value: 'blank'})
+        $('#ctxBorder').removeClass('red')
+        $('#ctx-form').hide()
+        $('#message-form').show()
+      }).then(patchConversation)
+    }
+
+    function patchConversation() {
+      var ids = []
+      self.props.messages.map((message) => {
+        // console.log(message)
+         ids.push(message.id)
+      })
+
+      // console.log(ids)
+      // console.log("In message form - the current conversation is: ")
+      // console.log(self.props.currentConversation)
+      const patchSearch = fetch('/conversations/'+self.props.currentConversation.id, {
+        method: 'PATCH',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+           user1: self.props.currentConversation.user1._id,
+           user2: self.props.currentConversation.user2._id,
+           messages: ids
+        })
+      })
+    }
+
+    // patchSearch.then(loadPatch)
+    sendSearch.then(loadMyMessage)
+
+
+
   },
 
   // change state of select options
   handleChange: function(event) {
     this.setState({value: event.target.value})
-    // console.log($("#ctxSelect option:selected").text())
   },
 
   // handel when user clicks close.. hide context form and show original input form

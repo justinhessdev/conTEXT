@@ -4,7 +4,10 @@ const
     messageSchema = new mongoose.Schema({
       _author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
       to: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-      body: {type: String}
+      body: {type: String},
+      context: {type: Boolean},
+      customContext: {type: String},
+      urgent: {type: Boolean}
     }, {timestamps: true})
 
 // middleware that runs before it returns User object back to you
