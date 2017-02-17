@@ -12,7 +12,7 @@ conversationSchema.pre('findOne', function() {
 })
 
 conversationSchema.pre('find', function() {
-  this.populate('user1 user2')
+  this.populate('user1 user2 messages')
 })
 
 module.exports = mongoose.model('Conversation', conversationSchema)

@@ -11,9 +11,9 @@ const
         }
     }, {timestamps: true})
 
-userSchema.pre('findOne', function() {
-  this.populate('posts')
-})
+// userSchema.pre('findOne', function() {
+//   this.populate('posts')
+// })
 
 userSchema.methods.generateHash = function(password){
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8))
