@@ -19,7 +19,7 @@ const Dashboard = React.createClass({
         {id: 4, user_id: "58a39219fc4c98025a646ff1", body: "😍", context: false, urgent: false, customContext:""}
       ],
       conversations: [],
-      currentConversation: 0,
+      currentConversation: [],
       currentUser: "",
       to: ""
     }
@@ -34,8 +34,15 @@ const Dashboard = React.createClass({
         data.json().then((jsonData) => {
           console.log(jsonData)
           if(!jsonData.status) {
+            self.setState({
+              currentUser: ""
+            })
+
+            console.log("Not logged in the current logged in user is: ")
+            console.log(self.state.currentUser)
             window.location = '/login'
           }
+
           self.setState({
             currentUser: jsonData.user._id
           })
@@ -44,12 +51,14 @@ const Dashboard = React.createClass({
 
       function loadMyUsers(data) {
         data.json().then((jsonData) => {
-          self.showConversationNames(jsonData)
+          self.showConversationListInfo(jsonData)
 
         })
       }
 
       function proceedIfLoggedIn() {
+        console.log("The currently logged in user is: ")
+        console.log(self.state.currentUser)
         const sendSearch = fetch('/conversations', {credentials: 'same-origin'})
 
         sendSearch.then(loadMyUsers)
@@ -84,18 +93,16 @@ const Dashboard = React.createClass({
       to: user2._id
     })
 
-    console.log("In conversation sending to: ")
-    console.log(this.state.to)
   },
 
-  showConversationNames: function(names) {
-    var conversationNames = []
-    names.map((n) => {
-      conversationNames.push({id: n._id, user2: n.user2.local.name})
+  showConversationListInfo: function(data) {
+    var conversationData = []
+    data.map((d) => {
+      conversationData.push({id: d._id, user1: d.user1, user2: d.user2})
     })
 
     this.setState({
-      conversations: conversationNames
+      conversations: conversationData
     })
   },
 
@@ -105,8 +112,10 @@ const Dashboard = React.createClass({
     })
   },
 
-  handleCurrentConversation: function(id) {
-    this.setState({currentConversation: id})
+  setCurrentConversation: function(conversation) {
+    this.setState({
+      currentConversation: conversation
+    })
   },
 
   render: function() {
@@ -118,8 +127,8 @@ const Dashboard = React.createClass({
       <div id="dashboard">
          <div className="row">
              <div className="col-xs-3">
-               <NewConversation showConversations={this.showConversations}/>
-               <ConversationList conversations={this.state.conversations} getDataFromConversation={this.getDataFromConversation} currentConversation={this.handleCurrentConversation} currentUser={this.state.currentUser} sendTo={this.state.to}/>
+               <NewConversation showUsersForNewConversation={this.showUsersForNewConversation}/>
+               <ConversationList conversations={this.state.conversations} getDataFromConversation={this.getDataFromConversation} currentConversation={this.setCurrentConversation} currentUser={this.state.currentUser} sendTo={this.state.to}/>
              </div>
              <div className="col-xs-9">
               <MessageList messages={this.state.messages} currentUser={this.state.currentUser}/>
@@ -135,21 +144,18 @@ const Dashboard = React.createClass({
 const NewConversation = React.createClass({
 
   startNewConversation: function() {
-  //   const sendSearch = fetch('/users', {credentials: 'same-origin'})
-  //   var self = this
-  //
-  //   function loadMyUsers(data) {
-  //     data.json().then((jsonData) => {
-  //       // console.log(jsonData)
-  //       self.props.showConversations(jsonData)
-  //
-  //       self.setState({
-  //         conversations: jsonData
-  //       })
-  //     })
-  //   }
-  //
-  //   sendSearch.then(loadMyUsers)
+    const sendSearch = fetch('/users', {credentials: 'same-origin'})
+    var self = this
+
+    function loadMyUsers(data) {
+      data.json().then((jsonData) => {
+        // console.log(jsonData)
+        self.props.showUsersForNewConversation(jsonData)
+
+      })
+    }
+
+    sendSearch.then(loadMyUsers)
   },
 
   render: function() {
@@ -165,7 +171,6 @@ const NewConversation = React.createClass({
       marginLeft: '1px',
       marginRight: '1px',
       marginTop: '5px'
-
     }
 
     return (
@@ -249,14 +254,16 @@ const MessageList = React.createClass({
 
 const ConversationList = React.createClass({
 
-  loadConversation: function(id) {
-    this.props.currentConversation(id)
-    const sendSearch = fetch('/conversations/' + id)
+  loadConversation: function(conversation) {
+    console.log("the current conversation is: ")
+    console.log(conversation)
+    this.props.currentConversation(conversation)
+    const sendSearch = fetch('/conversations/' + conversation.id)
     var self = this
 
     function loadMyConversation(data) {
       data.json().then((jsonData) => {
-        console.log(jsonData)
+        // console.log(jsonData)
         self.props.getDataFromConversation(jsonData.user1, jsonData.user2, jsonData.messages, false, 0, "")
       })
     }
@@ -271,12 +278,22 @@ const ConversationList = React.createClass({
           marginTop: '-2px'
       }
 
-        return (
-          <div onClick={() => this.loadConversation(c.id)} key={c.id}>
-            <hr style={pStyle}></hr>
-            <p className="text-center">{c.user2}</p>
-          </div>
-        )
+      var displayNotCurrentUser
+      // console.log(this.props.currentUser)
+      if(c.user2._id == this.props.currentUser || c.user1._id == this.props.currentUser){
+        if(c.user1._id == this.props.currentUser) {
+          displayNotCurrentUser = c.user2.local.name
+        } else if(c.user2._id == this.props.currentUser) {
+          displayNotCurrentUser = c.user1.local.name
+        }
+
+          return (
+            <div onClick={() => this.loadConversation(c)} key={c.id}>
+              <hr style={pStyle}></hr>
+              <p className="text-center">{displayNotCurrentUser}</p>
+            </div>
+          )
+      }
     })
 
     const divStyle = {
@@ -330,22 +347,22 @@ const MessageForm = React.createClass({
     function patchConversation() {
       var ids = []
       self.props.messages.map((message) => {
-        console.log(message)
+        // console.log(message)
          ids.push(message.id)
       })
 
-      console.log(ids)
-      console.log("the current conversation is: ")
+      // console.log(ids)
+      console.log("In message form - the current conversation is: ")
       console.log(self.props.currentConversation)
-      const patchSearch = fetch('/conversations/'+self.props.currentConversation, {
+      const patchSearch = fetch('/conversations/'+self.props.currentConversation.id, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-           user1: self.props.currentUser,
-           user2: self.props.sendTo,
+           user1: self.props.currentConversation.user1._id,
+           user2: self.props.currentConversation.user2._id,
            messages: ids
         })
       })
@@ -407,7 +424,7 @@ const CtxForm = React.createClass({
   // change state of select options
   handleChange: function(event) {
     this.setState({value: event.target.value})
-    console.log($("#ctxSelect option:selected").text())
+    // console.log($("#ctxSelect option:selected").text())
   },
 
   // handel when user clicks close.. hide context form and show original input form
@@ -424,7 +441,7 @@ const CtxForm = React.createClass({
       this.setState({
         urgentClickCount: this.state.urgentClickCount+1,
         isUrgent: !this.state.isUrgent
-      }, () => console.log(this.state))
+      })
   },
 
   // when i say onSubmit we want to prevent refresh of page from form
