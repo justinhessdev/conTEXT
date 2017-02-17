@@ -62,7 +62,13 @@ conversationRouter.route('/:id')
     // console.log(conversation)
     if (err) console.log(err)
     res.json(conversation)
+    })
   })
-})
+  .delete((req, res) => {
+    Conversation.findByIdAndRemove(req.params.id , (err) =>{
+      if (err) console.log(err)
+      res.json({message: "deleted"})
+    })
+  })
 
 module.exports = conversationRouter

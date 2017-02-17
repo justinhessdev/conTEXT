@@ -27,5 +27,20 @@ messageRouter.route('/:id')
       res.json(message)
     })
   })
+  .patch((req, res) => {
+    Message.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, message) => {
+    // respond here
+    // console.log("The patched message is: ")
+    // console.log(message)
+    if (err) console.log(err)
+    res.json(message)
+    })
+  })
+  .delete((req, res) => {
+    Message.findByIdAndRemove(req.params.id , (err) =>{
+      if (err) console.log(err)
+      res.json({message: "deleted"})
+    })
+  })
 
 module.exports = messageRouter
