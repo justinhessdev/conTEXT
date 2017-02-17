@@ -1,4 +1,5 @@
 const
+    dotenv = require('dotenv').load({silent:true}),
     express = require('express'),
     app = express(),
     ejs = require('ejs'),
