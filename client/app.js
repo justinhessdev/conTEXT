@@ -121,6 +121,7 @@ const Dashboard = React.createClass({
   },
 
   showUsersForNewConversation: function(users) {
+    $('#users-list').show()
     var usersArray = []
     users.map((u) => {
       usersArray.push(u)
@@ -142,14 +143,15 @@ const Dashboard = React.createClass({
       updateConvoArr.push(c)
     })
 
-    updateConvoArr.push(conversation)
+
+    updateConvoArr.push({id:conversation._id, user1: conversation.user1, user2: conversation.user2})
 
     this.setState({
       conversations: updateConvoArr
     })
 
-    console.log("There should be a new conversation now: ")
-    console.log("Array size is now: " + this.state.conversations.length)
+    // console.log("There should be a new conversation now: ")
+    // console.log("Array size is now: " + this.state.conversations.length)
     console.log(this.state.conversations)
   },
 
@@ -316,10 +318,6 @@ const ConversationList = React.createClass({
 
   render: function() {
 
-    console.log("This should get hit when button clicked and there shoul be new conversation");
-    console.log(this.props.conversations.length)
-    console.log(this.props.conversations)
-
     const conversations = this.props.conversations.map((c) => {
 
       const pStyle = {
@@ -328,36 +326,15 @@ const ConversationList = React.createClass({
 
       var displayNotCurrentUser
 
-      // if(this.props.startConvoWith._id && this.props.startConvoWith._id != this.props.currentUser){
-      //   console.log("made it in the final looooop")
-      //   displayNotCurrentUser = this.props.startConvoWith.local.name
-      //
-      //   return (
-      //     <div onClick={() => this.loadConversation(c)} key={c.id}>
-      //       <hr style={pStyle}></hr>
-      //       <p className="text-center">{displayNotCurrentUser}</p>
-      //     </div>
-      //   )
-      // }
-
-      // console.log(this.props.currentUser)
       if(c.user2._id == this.props.currentUser || c.user1._id == this.props.currentUser){
-        console.log("inside the if statement checking which user to display")
         if(c.user1._id == this.props.currentUser) {
           displayNotCurrentUser = c.user2.local.name
         } else if(c.user2._id == this.props.currentUser) {
           displayNotCurrentUser = c.user1.local.name
         }
 
-        console.log("displayNotCurrentUser is: " + displayNotCurrentUser)
-        console.log("Started convo with user using props id is:");
-        console.log(this.props.startConvoWith._id);
-        console.log(this.props.startConvoWith)
-        console.log("logged in user id is:");
-        console.log( this.props.currentUser);
-
           return (
-            <div onClick={() => this.loadConversation(c)} key={c.id}>
+            <div key={c.id} onClick={() => this.loadConversation(c)} >
               <hr style={pStyle}></hr>
               <p className="text-center">{displayNotCurrentUser}</p>
             </div>
@@ -400,11 +377,12 @@ const SelectUserForNewConversation = React.createClass({
     })
 
     function beginConversation(data) {
+
       self.props.startConvoWith(user2)
       data.json().then((jsonData) => {
         console.log("The new conversation is: ")
         console.log(jsonData)
-        self.props.addConversation(jsonData)
+        self.props.addConversation(jsonData.conversation)
 
         $('#conversations-list').show()
         $('#users-list').hide()
