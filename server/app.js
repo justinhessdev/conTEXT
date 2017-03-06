@@ -69,7 +69,9 @@ app.use(passport.session())
 app.use((req, res, next) => {
     app.locals.currentUser = req.user // currentUser now available in ALL views
     app.locals.loggedIn = !!req.user // a boolean loggedIn now available in ALL views
-
+    res.header('Access-Control-Allow-Origin', "*")
+    res.header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE')
+    res.header('Access-Control-Allow-Headers', 'Content-Type')
     next()
 })
 
