@@ -41,6 +41,7 @@ userRouter.get('/status', (req, res) => {
 ///////////////////////////////////////////
 userRouter.get('/users', isLoggedIn, (req, res) => {
   User.find({}, (err, users) => {
+    console.log(users)
     res.json(users)
   })
 })
