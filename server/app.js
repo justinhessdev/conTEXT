@@ -16,7 +16,8 @@ const
     passportConfig = require('./config/passport.js'),
     ///////////////
     userRoutes = require('./routes/users.js'),
-    conversationRoutes = require('./routes/conversations.js')
+    userV2Routes = require('./routes/usersV2.js'),
+    conversationRoutes = require('./routes/conversations.js'),
     messageRoutes = require('./routes/messages.js')
 
     // console.log(userRoutes)
