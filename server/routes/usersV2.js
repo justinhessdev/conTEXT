@@ -7,12 +7,20 @@ const
 
 
 ///////////////////////////////////////////
-userV2Router.get('/users', isLoggedIn, (req, res) => {
+userV2Router.get('/', isLoggedIn, (req, res) => {
   User.find({}, (err, users) => {
     console.log(users)
     res.json(users)
   })
 })
+
+userV2Router.route('/:id')
+  .get((req,res) => {
+    User.findById(req.params.id , (err, user) =>{
+      if (err) console.log(err)
+      res.json(user)
+    })
+  })
 
 // a method used to authorize a user BEFORE allowing them to proceed to the profile page:
 function isLoggedIn(req, res, next){
