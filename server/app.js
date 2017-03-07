@@ -76,6 +76,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/', userRoutes)
+app.use('/usersV2', userV2Routes)
 app.use('/conversations', conversationRoutes)
 app.use('/messages', messageRoutes)
 
