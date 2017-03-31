@@ -2,6 +2,8 @@ const
     dotenv = require('dotenv').load({silent:true}),
     express = require('express'),
     app = express(),
+    server = require('http').createServer(app),
+    io = require('socket.io').listen(server),
     ejs = require('ejs'),
     ejsLayouts = require('express-ejs-layouts'),
     mongoose = require('mongoose'),
@@ -20,9 +22,8 @@ const
     conversationRoutes = require('./routes/conversations.js'),
     messageRoutes = require('./routes/messages.js')
 
-    // console.log(userRoutes)
-    // console.log(passportConfig);
-    // console.log(passport);
+var users = []
+var connections = []
 
 // environment port
 const
@@ -87,15 +88,22 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-//////////////////
+// when there is an event of type 'connection'
+io.sockets.on('connection', (socket) => {
+  connections.push(socket)
+  console.log('user is connected');
+  console.log('Connected: %s sockets connected', connections.length);
 
-// API routes here: as opposed to our /#/ routes
-// app.get('/api/users', (req, res) => {
-//   User.find({}, (err, users) => {
-//     res.json(users)
-//   })
-// })
+  socket.on('disconnect', (data) => {
+    connections.splice(connections.indexOf(socket), 1)
+    console.log('Disconnected: %s sockets connected', connections.length);
+  })
 
-app.listen(port, (err) => {
-  console.log(err || "Server running")
+  socket.on('send-message', (data) => {
+    io.sockets.emit('new-message', data)
+  })
+})
+
+server.listen(port, (err) => {
+  console.log(err || 'listening on my very special port ' + port)
 })
