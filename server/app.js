@@ -100,6 +100,8 @@ io.sockets.on('connection', (socket) => {
   })
 
   socket.on('send-message', (data) => {
+    console.log("Messages received from client are: ")
+    console.log(data)
     io.sockets.emit('new-message', data)
   })
 })

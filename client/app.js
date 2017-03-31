@@ -495,13 +495,16 @@ const MessageForm = React.createClass({
 
     var self = this
     var id
+    var obj
 
     function loadMyMessage(data) {
       data.json().then((jsonData) => {
         // console.log(jsonData);
         id = jsonData._id
         // console.log(id);
-        self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
+        obj = {id:id, body:self.refs.newMessage.value, context:false, urgent:false, customContext:""}
+        // self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
+        socket.emit('send-message', obj)
         self.refs.newMessage.value = ''
       }).then(patchConversation)
     }
@@ -529,6 +532,16 @@ const MessageForm = React.createClass({
         })
       })
     }
+
+    // function emitConversation() {
+    //   socket.emit('send-message', self.props.messages)
+    // }
+
+    socket.on('new-message', (data) => {
+        console.log("CLIENT --- we got messages back from server")
+        console.log(data)
+        self.props.onSubmit(data.id, data.body, data.context, data.urgent, data.customContext)
+    })
 
     // patchSearch.then(loadPatch)
     sendSearch.then(loadMyMessage)

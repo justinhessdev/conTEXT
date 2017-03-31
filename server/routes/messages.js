@@ -11,8 +11,8 @@ messageRouter.route('/')
     })
     .post((req, res) => {
       var newMessage = new Message(req.body)
-      console.log("server - the new message we received from client is")
-      console.log(newMessage)
+      // console.log("server - the new message we received from client is")
+      // console.log(newMessage)
       newMessage.save((err, message) => {
         if(err) console.log(err)
         res.json(message)
