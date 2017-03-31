@@ -8,6 +8,8 @@
 // Dashboard won't 'render' until 'getInitialState' is complete ---- lifecycle
 // setState is accesible by all componenets
 
+var socket = io.connect()
+
 const Dashboard = React.createClass({
   getInitialState: function() {
     return {
@@ -28,6 +30,7 @@ const Dashboard = React.createClass({
   },
 
   componentWillMount: function() {
+
       const currentUserLoggedIn = fetch('/status', {credentials: 'same-origin'})
 
       var self = this
@@ -503,8 +506,7 @@ const MessageForm = React.createClass({
         id = jsonData._id
         // console.log(id);
         obj = {id:id, body:self.refs.newMessage.value, context:false, urgent:false, customContext:""}
-        // self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
-        socket.emit('send-message', obj)
+        self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
         self.refs.newMessage.value = ''
       }).then(patchConversation)
     }
@@ -530,12 +532,14 @@ const MessageForm = React.createClass({
            user2: self.props.currentConversation.user2._id,
            messages: ids
         })
-      })
+      }).then(emitConversation)
     }
 
-    // function emitConversation() {
-    //   socket.emit('send-message', self.props.messages)
-    // }
+    function emitConversation() {
+      console.log("obj is: ")
+      console.log(obj)
+      socket.emit('send-message', obj);
+    }
 
     socket.on('new-message', (data) => {
         console.log("CLIENT --- we got messages back from server")
