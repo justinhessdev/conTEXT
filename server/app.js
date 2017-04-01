@@ -27,7 +27,7 @@ var connections = []
 
 // environment port
 const
-    port = process.env.PORT || 3000,
+    port = process.env.PORT || 8080,
     mongoConnectionString = process.env.MONGODB_URL || 'mongodb://localhost/context-app'
 
     mongoose.connect(mongoConnectionString, (err) => {
