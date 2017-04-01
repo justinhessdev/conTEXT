@@ -10,6 +10,34 @@
 
 var socket = io.connect()
 
+// socket.on('new-message', (data) => {
+//     console.log("ALL CLIENTS SHOULD GET THIS MESSAGE")
+//     console.log(Dashboard)
+//     Dashboard.createMessage(data.id, data.body, data.context, data.urgent, data.customContext)
+// })
+
+// class SocketListener extends React.Component {
+//   state: function() {
+//     return
+//     (
+//       messages: []
+//     )
+//   }
+//   componentDidMount: function() {
+//     socket.on('new-message', (data) => {
+//       this.setState({ messages: this.state.messages.concat(data) })
+//     });
+//   }
+//
+//   render: function() {
+//     return (
+//       <Dashboard
+//         messages={this.state.messages}
+//       />
+//     )
+//   }
+// }
+
 const Dashboard = React.createClass({
   getInitialState: function() {
     return {
@@ -72,6 +100,14 @@ const Dashboard = React.createClass({
       currentUserLoggedIn.then(grabUserId)
 
 
+  },
+
+  componentDidMount: function() {
+    socket.on('new-message', (data) => {
+        console.log("ALL CLIENTS SHOULD GET THIS MESSAGE")
+        // console.log(Dashboard)
+        this.createMessage(data.id, data.body, data.context, data.urgent, data.customContext)
+    })
   },
 
   // .map will return new array based on original one, formated how we choose
@@ -506,7 +542,7 @@ const MessageForm = React.createClass({
         id = jsonData._id
         // console.log(id);
         obj = {id:id, body:self.refs.newMessage.value, context:false, urgent:false, customContext:""}
-        self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
+        // self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
         self.refs.newMessage.value = ''
       }).then(patchConversation)
     }
@@ -517,6 +553,8 @@ const MessageForm = React.createClass({
         // console.log(message)
          ids.push(message.id)
       })
+
+      ids.push(obj.id) // push the newest message
 
       // console.log(ids)
       // console.log("In message form - the current conversation is: ")
@@ -540,12 +578,6 @@ const MessageForm = React.createClass({
       console.log(obj)
       socket.emit('send-message', obj);
     }
-
-    socket.on('new-message', (data) => {
-        console.log("CLIENT --- we got messages back from server")
-        console.log(data)
-        self.props.onSubmit(data.id, data.body, data.context, data.urgent, data.customContext)
-    })
 
     // patchSearch.then(loadPatch)
     sendSearch.then(loadMyMessage)
