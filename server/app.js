@@ -46,6 +46,7 @@ const store = new MongoDBStore({
 // now app will look for everything in static client directory
 // process.env finds the environment of our app .. and we can access the root (pwd)
 app.use(express.static(process.env.PWD + '/client'))
+app.use('/resources', express.static(path.join(__dirname, 'resources')))
 app.use(logger('dev'))
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}))
