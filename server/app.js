@@ -2,8 +2,8 @@ const
     dotenv = require('dotenv').load({silent:true}),
     express = require('express'),
     app = express(),
-    // server = require('http').createServer(app),
-    server  = app.listen(8080);
+    server = require('http').createServer(app),
+    // server  = app.listen(8080);
     io = require('socket.io').listen(server),
     ejs = require('ejs'),
     ejsLayouts = require('express-ejs-layouts'),
@@ -107,6 +107,6 @@ io.sockets.on('connection', (socket) => {
   })
 })
 
-// server.listen(port, (err) => {
-//   console.log(err || 'listening on my very special port ' + port)
-// })
+server.listen(port, (err) => {
+  console.log(err || 'listening on my very special port ' + port)
+})
