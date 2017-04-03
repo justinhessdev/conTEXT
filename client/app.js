@@ -108,17 +108,28 @@ const Dashboard = React.createClass({
         // console.log(Dashboard)
         this.createMessage(data.id, data.body, data.context, data.urgent, data.customContext)
     })
+
+    socket.on('new-message-from-jj-to-joe', (data) => {
+        console.log("In original app - new message received from jj to joe")
+        console.log(data)
+        this.createMessageFromJJToJoe(data.id, data.body, data.context, data.urgent, data.customContext)
+    })
   },
 
   // .map will return new array based on original one, formated how we choose
 
+  createMessageFromJJToJoe: function(id, body, context, urgent, customContext) {
+
+    this.setState({
+      isLoggedIn: false,
+      messages: [
+        ...this.state.messages,
+        {id: id, user_id: "58a743735adab10011e223d9", body: body, context: context, urgent: urgent, customContext: customContext}
+      ]
+    })
+  },
+
   createMessage: function(id, body, context, urgent, customContext) {
-    // console.log("We are sending the context from ctx form here to dashboard and showing id, body, context, urgent, custom context")
-    // console.log(id)
-    // console.log(body)
-    // console.log(context)
-    // console.log(urgent)
-    // console.log(customContext)
 
     this.setState({
       isLoggedIn: false,
