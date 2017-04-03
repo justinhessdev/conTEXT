@@ -106,6 +106,12 @@ io.sockets.on('connection', (socket) => {
     console.log(data)
     io.sockets.emit('new-message', data)
   })
+
+  socket.on('send-message-from-jj-to-joe', (data) => {
+    console.log("Messages received from client are: ")
+    console.log(data)
+    io.sockets.emit('new-message-from-jj-to-joe', data)
+  })
 })
 
 server.listen(port, (err) => {
