@@ -118,6 +118,17 @@ const Dashboard = React.createClass({
 
   // .map will return new array based on original one, formated how we choose
 
+  createMessageFromJJToJoe: function(id, body, context, urgent, customContext) {
+
+    this.setState({
+      isLoggedIn: false,
+      messages: [
+        ...this.state.messages,
+        {id: id, user_id: "58a743735adab10011e223d9", body: body, context: context, urgent: urgent, customContext: customContext}
+      ]
+    })
+  },
+
   createMessage: function(id, body, context, urgent, customContext) {
 
     this.setState({
