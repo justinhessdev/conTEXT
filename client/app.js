@@ -639,6 +639,7 @@ const CtxForm = React.createClass({
 
         var self = this
         var id
+        var obj
 
     const sendSearch = fetch('/messages', {
       method: 'POST',
@@ -656,7 +657,6 @@ const CtxForm = React.createClass({
       })
     })
 
-
     function loadMyMessage(data) {
       data.json().then((jsonData) => {
         // console.log("The message we received from server is: ")
@@ -664,7 +664,8 @@ const CtxForm = React.createClass({
         id = jsonData._id
         // console.log(id);
         var customctx = $("#ctxSelect option:selected").text()
-        self.props.onSubmit(id, self.refs.ctxMessage.value, true, self.state.isUrgent, customctx)
+        obj = {id:id, body:self.refs.ctxMessage.value, context:true, urgent:self.state.isUrgent, customContext:customctx}
+        // self.props.onSubmit(id, self.refs.ctxMessage.value, true, self.state.isUrgent, customctx)
         self.refs.ctxMessage.value = ''
         self.setState({isUrgent: false, value: 'blank'})
         $('#ctxBorder').removeClass('red')
@@ -680,6 +681,8 @@ const CtxForm = React.createClass({
          ids.push(message.id)
       })
 
+      ids.push(obj.id)
+
       // console.log(ids)
       // console.log("In message form - the current conversation is: ")
       // console.log(self.props.currentConversation)
@@ -694,7 +697,13 @@ const CtxForm = React.createClass({
            user2: self.props.currentConversation.user2._id,
            messages: ids
         })
-      })
+      }).then(emitConversation)
+    }
+
+    function emitConversation() {
+      console.log("obj is: ")
+      console.log(obj)
+      socket.emit('send-message', obj);
     }
 
     // patchSearch.then(loadPatch)
