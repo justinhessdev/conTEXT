@@ -106,7 +106,7 @@ const Dashboard = React.createClass({
     socket.on('new-message', (data) => {
         console.log("In original app - ALL CLIENTS SHOULD GET THIS MESSAGE")
         // console.log(Dashboard)
-        this.createMessage(data.id, data.body, data.context, data.urgent, data.customContext)
+        this.createSocketMessage(data.id, data.author, data.to, data.body, data.context, data.urgent, data.customContext)
     })
 
     socket.on('new-message-from-jj-to-joe', (data) => {
@@ -136,6 +136,17 @@ const Dashboard = React.createClass({
       messages: [
         ...this.state.messages,
         {id: id, user_id: this.state.currentUser, body: body, context: context, urgent: urgent, customContext: customContext}
+      ]
+    })
+  },
+
+  createSocketMessage: function(id, author, to, body, context, urgent, customContext) {
+
+    this.setState({
+      isLoggedIn: false,
+      messages: [
+        ...this.state.messages,
+        {id: id, user_id: author, body: body, context: context, urgent: urgent, customContext: customContext}
       ]
     })
   },
@@ -552,7 +563,8 @@ const MessageForm = React.createClass({
         // console.log(jsonData);
         id = jsonData._id
         // console.log(id);
-        obj = {id:id, body:self.refs.newMessage.value, context:false, urgent:false, customContext:""}
+        obj = {id:id, author:this.props.currentUser, to:this.props.sendTo, body:self.refs.newMessage.value, context:false, urgent:false, customContext:""}
+        // console.log(obj)
         // self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
         self.refs.newMessage.value = ''
       }).then(patchConversation)
