@@ -563,7 +563,7 @@ const MessageForm = React.createClass({
         // console.log(jsonData);
         id = jsonData._id
         // console.log(id);
-        obj = {id:id, author:this.props.currentUser, to:this.props.sendTo, body:self.refs.newMessage.value, context:false, urgent:false, customContext:""}
+        obj = {id:id, author:jsonData._author, to:jsonData.to, body:self.refs.newMessage.value, context:false, urgent:false, customContext:""}
         // console.log(obj)
         // self.props.onSubmit(id, self.refs.newMessage.value, false, false, "")
         self.refs.newMessage.value = ''
