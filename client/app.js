@@ -10,34 +10,6 @@
 
 var socket = io.connect()
 
-// socket.on('new-message', (data) => {
-//     console.log("ALL CLIENTS SHOULD GET THIS MESSAGE")
-//     console.log(Dashboard)
-//     Dashboard.createMessage(data.id, data.body, data.context, data.urgent, data.customContext)
-// })
-
-// class SocketListener extends React.Component {
-//   state: function() {
-//     return
-//     (
-//       messages: []
-//     )
-//   }
-//   componentDidMount: function() {
-//     socket.on('new-message', (data) => {
-//       this.setState({ messages: this.state.messages.concat(data) })
-//     });
-//   }
-//
-//   render: function() {
-//     return (
-//       <Dashboard
-//         messages={this.state.messages}
-//       />
-//     )
-//   }
-// }
-
 const Dashboard = React.createClass({
   getInitialState: function() {
     return {
