@@ -6,7 +6,7 @@
 
 
 
-###### open app: <https://shielded-dusk-72399.herokuapp.com/>
+###### open app: <https://context-app.herokuapp.com/>
 
 ###### Send instant messages
 ![Alt text](./client/img/message_list.png?raw=true "Optional Title")
